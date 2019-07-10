@@ -41,6 +41,7 @@ import org.springframework.data.elasticsearch.core.geo.GeoBox;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.data.elasticsearch.entities.SampleEntity;
 import org.springframework.data.elasticsearch.repositories.custom.SampleCustomMethodRepository;
+import org.springframework.data.elasticsearch.repositories.custom.SampleStreamingCustomMethodRepository;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.data.geo.Box;
 import org.springframework.data.geo.Distance;
@@ -66,6 +67,7 @@ import lombok.NoArgsConstructor;
 public class CustomMethodRepositoryTests {
 
 	@Autowired private SampleCustomMethodRepository repository;
+	@Autowired private SampleStreamingCustomMethodRepository streamingRepository;
 
 	@Autowired private ElasticsearchTemplate elasticsearchTemplate;
 
@@ -342,8 +344,8 @@ public class CustomMethodRepositoryTests {
 		List<SampleEntity> list = repository.findByKeywordIn(keywords);
 
 		// then
-		assertThat(list.size()).isEqualTo(1L);
-		assertThat(list.get(0).getId()).isEqualTo(documentId1);
+		assertThat(list.size(), is(equalTo(1)));
+		assertThat(list.get(0).getId(), is(equalTo(documentId1)));
 	}
 
 	@Test
@@ -373,8 +375,8 @@ public class CustomMethodRepositoryTests {
 		List<SampleEntity> list = repository.findByKeywordNotIn(keywords);
 
 		// then
-		assertThat(list.size()).isEqualTo(1L);
-		assertThat(list.get(0).getId()).isEqualTo(documentId2);
+		assertThat(list.size(), is(equalTo(1)));
+		assertThat(list.get(0).getId(), is(equalTo(documentId2)));
 	}
 
 	@Test
@@ -731,7 +733,8 @@ public class CustomMethodRepositoryTests {
 		repository.saveAll(entities);
 
 		// when
-		Stream<SampleEntity> stream = repository.findByType("abc");
+		Stream<SampleEntity> stream = streamingRepository.findByType("abc");
+
 		// then
 		assertThat(stream, is(notNullValue()));
 		assertThat(stream.count(), is(equalTo(30L)));
@@ -1273,7 +1276,6 @@ public class CustomMethodRepositoryTests {
 
 	@Test // DATAES-605
 	public void streamMethodsShouldWorkWithLargeResultSets() {
-
 		// given
 		List<SampleEntity> entities = createSampleEntities("abc", 10001);
 		repository.saveAll(entities);
@@ -1282,13 +1284,12 @@ public class CustomMethodRepositoryTests {
 		Stream<SampleEntity> stream = streamingRepository.findByType("abc");
 
 		// then
-		assertThat(stream).isNotNull();
-		assertThat(stream.count()).isEqualTo(10001L);
+		assertThat(stream, is(notNullValue()));
+		assertThat(stream.count(), is(equalTo(10001L)));
 	}
 
 	@Test // DATAES-605
 	public void streamMethodsCanHandlePageable() {
-
 		// given
 		List<SampleEntity> entities = createSampleEntities("abc", 10);
 		repository.saveAll(entities);
@@ -1297,15 +1298,15 @@ public class CustomMethodRepositoryTests {
 		Stream<SampleEntity> stream = streamingRepository.findByType("abc", PageRequest.of(0, 2));
 
 		// then
-		assertThat(stream).isNotNull();
-		assertThat(stream.count()).isEqualTo(10L);
+		assertThat(stream, is(notNullValue()));
+		assertThat(stream.count(), is(equalTo(10L)));
 	}
 
 	private List<SampleEntity> createSampleEntities(String type, int numberOfEntities) {
 		List<SampleEntity> entities = new ArrayList<>();
 		for (int i = 0; i < numberOfEntities; i++) {
 			SampleEntity entity = new SampleEntity();
-			entity.setId(randomNumeric(numberOfEntities));
+			entity.setId(randomNumeric(32));
 			entity.setAvailable(true);
 			entity.setMessage("Message");
 			entity.setType(type);
