@@ -22,15 +22,18 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.data.elasticsearch.entities.SampleEntity;
@@ -41,6 +44,11 @@ import org.springframework.data.geo.Metrics;
 import org.springframework.data.geo.Point;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Rizwan Idrees
@@ -1255,6 +1263,53 @@ public class CustomMethodRepositoryTests {
 		long count = repository.countByLocationNear(new Point(45.7806d, 3.0875d), new Distance(2, Metrics.KILOMETERS));
 		// then
 		assertThat(count, is(equalTo(1L)));
+	}
+
+	@Test // DATAES-605
+	public void streamMethodsShouldWorkWithLargeResultSets() {
+		// given
+		List<SampleEntity> entities = createSampleEntities("abc", 10001);
+		repository.saveAll(entities);
+
+		// when
+		Stream<SampleEntity> stream = streamingRepository.findByType("abc");
+
+		// then
+		assertThat(stream).isNotNull();
+		assertThat(stream.count()).isEqualTo(10001L);
+	}
+
+	@Test // DATAES-605
+	public void streamMethodsCanHandlePageable() {
+		// given
+		List<SampleEntity> entities = createSampleEntities("abc", 10);
+		repository.saveAll(entities);
+
+		// when
+		Stream<SampleEntity> stream = streamingRepository.findByType("abc", PageRequest.of(0, 2));
+
+		// then
+		assertThat(stream).isNotNull();
+		assertThat(stream.count()).isEqualTo(10L);
+	}
+
+	@Test // DATAES-XXX
+	public void streamMethodsCanSort() {
+		// given
+		repository.save(createEntityWithTypeAndRate("abc", 7));
+		repository.save(createEntityWithTypeAndRate("abc", 5));
+		repository.save(createEntityWithTypeAndRate("abc", 12));
+
+		// when
+		Stream<SampleEntity> stream = streamingRepository.findByTypeOrderByRate("abc");
+		List<SampleEntity> list = stream.collect(Collectors.toList());
+
+		// then
+		assertThat(list.size()).isEqualTo(3L);
+		assertThat(list.get(0).rate).isEqualTo(5);
+		assertThat(list.get(1).rate).isEqualTo(7);
+		assertThat(list.get(2).rate).isEqualTo(12);
+>>>>>>> 1b222fa1... Use terms-query instead of should for In/NotIn-queries:src/test/java/org/springframework/data/elasticsearch/repositories/custommethod/CustomMethodRepositoryBaseTests.java
 	}
 
 	private List<SampleEntity> createSampleEntities(String type, int numberOfEntities) {
