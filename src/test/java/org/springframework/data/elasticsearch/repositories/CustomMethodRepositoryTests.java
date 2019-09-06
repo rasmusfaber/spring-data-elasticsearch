@@ -19,6 +19,15 @@ import static org.apache.commons.lang.RandomStringUtils.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+<<<<<<< HEAD:src/test/java/org/springframework/data/elasticsearch/repositories/CustomMethodRepositoryTests.java
+=======
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.lang.Long;
+>>>>>>> 40c7632c... Fixup:src/test/java/org/springframework/data/elasticsearch/repositories/custommethod/CustomMethodRepositoryBaseTests.java
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,11 +54,6 @@ import org.springframework.data.geo.Point;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 /**
  * @author Rizwan Idrees
  * @author Mohsin Husen
@@ -63,6 +67,7 @@ public class CustomMethodRepositoryTests {
 
 	@Autowired private SampleCustomMethodRepository repository;
 
+<<<<<<< HEAD:src/test/java/org/springframework/data/elasticsearch/repositories/CustomMethodRepositoryTests.java
 	@Autowired private ElasticsearchTemplate elasticsearchTemplate;
 
 	@Before
@@ -72,6 +77,9 @@ public class CustomMethodRepositoryTests {
 		elasticsearchTemplate.putMapping(SampleEntity.class);
 		elasticsearchTemplate.refresh(SampleEntity.class);
 	}
+=======
+	@Autowired private SampleStreamingCustomMethodRepository streamingRepository;
+>>>>>>> 40c7632c... Fixup:src/test/java/org/springframework/data/elasticsearch/repositories/custommethod/CustomMethodRepositoryBaseTests.java
 
 	@Test
 	public void shouldExecuteCustomMethod() {
@@ -1293,25 +1301,6 @@ public class CustomMethodRepositoryTests {
 		assertThat(stream.count()).isEqualTo(10L);
 	}
 
-	@Test // DATAES-XXX
-	public void streamMethodsCanSort() {
-		// given
-		repository.save(createEntityWithTypeAndRate("abc", 7));
-		repository.save(createEntityWithTypeAndRate("abc", 5));
-		repository.save(createEntityWithTypeAndRate("abc", 12));
-
-		// when
-		Stream<SampleEntity> stream = streamingRepository.findByTypeOrderByRate("abc");
-		List<SampleEntity> list = stream.collect(Collectors.toList());
-
-		// then
-		assertThat(list.size()).isEqualTo(3L);
-		assertThat(list.get(0).rate).isEqualTo(5);
-		assertThat(list.get(1).rate).isEqualTo(7);
-		assertThat(list.get(2).rate).isEqualTo(12);
->>>>>>> 1b222fa1... Use terms-query instead of should for In/NotIn-queries:src/test/java/org/springframework/data/elasticsearch/repositories/custommethod/CustomMethodRepositoryBaseTests.java
-	}
-
 	private List<SampleEntity> createSampleEntities(String type, int numberOfEntities) {
 		List<SampleEntity> entities = new ArrayList<>();
 		for (int i = 0; i < numberOfEntities; i++) {
@@ -1325,17 +1314,6 @@ public class CustomMethodRepositoryTests {
 		return entities;
 	}
 
-	private SampleEntity createEntityWithTypeAndRate(String type, int rate) {
-		SampleEntity entity = new SampleEntity();
-		entity.setId(randomNumeric(32));
-		entity.setAvailable(true);
-		entity.setMessage("Message");
-		entity.setType(type);
-		entity.setRate(rate);
-
-		return entity;
-	}
-
 	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor
@@ -1344,19 +1322,14 @@ public class CustomMethodRepositoryTests {
 			refreshInterval = "-1")
 	static class SampleEntity {
 
-		@Id
-		private String id;
-		@Field(type = Text, store = true, fielddata = true)
-		private String type;
-		@Field(type = Text, store = true, fielddata = true)
-		private String message;
-		@Field(type = Keyword)
-		private String keyword;
+		@Id private String id;
+		@Field(type = Text, store = true, fielddata = true) private String type;
+		@Field(type = Text, store = true, fielddata = true) private String message;
+		@Field(type = Keyword) private String keyword;
 		private int rate;
 		private boolean available;
 		private GeoPoint location;
-		@Version
-		private Long version;
+		@Version private Long version;
 	}
 
 	/**
@@ -1470,7 +1443,5 @@ public class CustomMethodRepositoryTests {
 		Stream<SampleEntity> findByType(String type);
 
 		Stream<SampleEntity> findByType(String type, Pageable pageable);
-
-		Stream<SampleEntity> findByTypeOrderByRate(String type);
 	}
 }

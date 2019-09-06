@@ -11,12 +11,6 @@
 =======
     <logger name="org.springframework.data.elasticsearch.ElasticsearchVersionRule" level="info" />
 	<logger name="org.springframework.data.elasticsearch.client.WIRE" level="info"/>
-    <logger name="org.springframework.data.elasticsearch" level="DEBUG">
-        <appender-ref ref="console"/>
-    </logger>
-    <logger name="org.elasticsearch.action.search" level="DEBUG">
-        <appender-ref ref="console"/>
-    </logger>
 
 >>>>>>> 1b222fa1... Use terms-query instead of should for In/NotIn-queries
     <root level="error">
