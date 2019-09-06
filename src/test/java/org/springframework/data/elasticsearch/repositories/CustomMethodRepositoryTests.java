@@ -321,6 +321,7 @@ public class CustomMethodRepositoryTests {
 
 	@Test
 	public void inCanHandleManyValues() {
+
 		// given
 		String documentId1 = randomNumeric(32);
 		SampleEntity sampleEntity1 = new SampleEntity();
@@ -351,6 +352,7 @@ public class CustomMethodRepositoryTests {
 
 	@Test
 	public void notInCanHandleManyValues() {
+
 		// given
 		String documentId1 = randomNumeric(32);
 		SampleEntity sampleEntity1 = new SampleEntity();
@@ -1275,6 +1277,7 @@ public class CustomMethodRepositoryTests {
 
 	@Test // DATAES-605
 	public void streamMethodsShouldWorkWithLargeResultSets() {
+
 		// given
 		List<SampleEntity> entities = createSampleEntities("abc", 10001);
 		repository.saveAll(entities);
@@ -1289,6 +1292,7 @@ public class CustomMethodRepositoryTests {
 
 	@Test // DATAES-605
 	public void streamMethodsCanHandlePageable() {
+
 		// given
 		List<SampleEntity> entities = createSampleEntities("abc", 10);
 		repository.saveAll(entities);
