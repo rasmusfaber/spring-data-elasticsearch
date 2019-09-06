@@ -88,6 +88,10 @@ public interface SampleCustomMethodRepository extends ElasticsearchRepository<Sa
 
 	Page<SampleEntity> findByLocationNear(GeoPoint point, String distance, Pageable pageable);
 
+	List<SampleEntity> findByKeywordIn(List<String> keywords);
+
+	List<SampleEntity> findByKeywordNotIn(List<String> keywords);
+
 	Stream<SampleEntity> findByType(String type);
 
 	long countByType(String type);

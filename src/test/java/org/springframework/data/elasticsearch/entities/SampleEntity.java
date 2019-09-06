@@ -53,6 +53,8 @@ public class SampleEntity {
 	private String type;
 	@Field(type = Text, store = true, fielddata = true)
 	private String message;
+	@Field(type = Keyword)
+	private String keyword;
 	private int rate;
 	@ScriptedField
 	private Double scriptedRate;
