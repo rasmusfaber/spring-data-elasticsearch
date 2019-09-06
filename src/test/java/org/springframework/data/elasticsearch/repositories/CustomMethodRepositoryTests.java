@@ -19,19 +19,16 @@ import static org.apache.commons.lang.RandomStringUtils.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
-<<<<<<< HEAD:src/test/java/org/springframework/data/elasticsearch/repositories/CustomMethodRepositoryTests.java
-=======
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.lang.Long;
->>>>>>> 40c7632c... Fixup:src/test/java/org/springframework/data/elasticsearch/repositories/custommethod/CustomMethodRepositoryBaseTests.java
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.junit.Before;
@@ -66,8 +63,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class CustomMethodRepositoryTests {
 
 	@Autowired private SampleCustomMethodRepository repository;
+	@Autowired private SampleStreamingCustomMethodRepository streamingRepository;
 
-<<<<<<< HEAD:src/test/java/org/springframework/data/elasticsearch/repositories/CustomMethodRepositoryTests.java
 	@Autowired private ElasticsearchTemplate elasticsearchTemplate;
 
 	@Before
@@ -77,9 +74,6 @@ public class CustomMethodRepositoryTests {
 		elasticsearchTemplate.putMapping(SampleEntity.class);
 		elasticsearchTemplate.refresh(SampleEntity.class);
 	}
-=======
-	@Autowired private SampleStreamingCustomMethodRepository streamingRepository;
->>>>>>> 40c7632c... Fixup:src/test/java/org/springframework/data/elasticsearch/repositories/custommethod/CustomMethodRepositoryBaseTests.java
 
 	@Test
 	public void shouldExecuteCustomMethod() {
