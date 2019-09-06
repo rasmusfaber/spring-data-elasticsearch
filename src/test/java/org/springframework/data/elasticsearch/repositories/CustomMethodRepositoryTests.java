@@ -57,6 +57,7 @@ public class CustomMethodRepositoryTests {
 
 	@Autowired private ElasticsearchTemplate elasticsearchTemplate;
 
+<<<<<<< HEAD:src/test/java/org/springframework/data/elasticsearch/repositories/CustomMethodRepositoryTests.java
 	@Before
 	public void before() {
 		elasticsearchTemplate.deleteIndex(SampleEntity.class);
@@ -65,6 +66,8 @@ public class CustomMethodRepositoryTests {
 		elasticsearchTemplate.refresh(SampleEntity.class);
 	}
 
+=======
+>>>>>>> 1b222fa1... Use terms-query instead of should for In/NotIn-queries:src/test/java/org/springframework/data/elasticsearch/repositories/custommethod/CustomMethodRepositoryBaseTests.java
 	@Test
 	public void shouldExecuteCustomMethod() {
 		// given
@@ -298,9 +301,75 @@ public class CustomMethodRepositoryTests {
 		// when
 		Page<SampleEntity> page = repository.findByIdNotIn(ids, new PageRequest(0, 10));
 		// then
+<<<<<<< HEAD:src/test/java/org/springframework/data/elasticsearch/repositories/CustomMethodRepositoryTests.java
 		assertThat(page, is(notNullValue()));
 		assertThat(page.getTotalElements(), is(equalTo(1L)));
 		assertThat(page.getContent().get(0).getId(), is(documentId2));
+=======
+		assertThat(page).isNotNull();
+		assertThat(page.getTotalElements()).isEqualTo(1L);
+		assertThat(page.getContent().get(0).getId()).isEqualTo(documentId2);
+	}
+
+	@Test
+	public void inCanHandleManyValues() {
+		// given
+		String documentId1 = randomNumeric(32);
+		SampleEntity sampleEntity1 = new SampleEntity();
+		sampleEntity1.setId(documentId1);
+		sampleEntity1.setKeyword("foo");
+		repository.save(sampleEntity1);
+
+		String documentId2 = randomNumeric(32);
+		SampleEntity sampleEntity2 = new SampleEntity();
+		sampleEntity2.setId(documentId2);
+		sampleEntity2.setKeyword("bar");
+		repository.save(sampleEntity2);
+
+		List<String> keywords = new ArrayList<>();
+		keywords.add("foo");
+
+		for (int i = 0; i < 1025; i++) {
+			keywords.add(randomNumeric(32));
+		}
+
+		// when
+		List<SampleEntity> list = repository.findByKeywordIn(keywords);
+
+		// then
+		assertThat(list.size()).isEqualTo(1L);
+		assertThat(list.get(0).getId()).isEqualTo(documentId1);
+	}
+
+	@Test
+	public void notInCanHandleManyValues() {
+		// given
+		String documentId1 = randomNumeric(32);
+		SampleEntity sampleEntity1 = new SampleEntity();
+		sampleEntity1.setId(documentId1);
+		sampleEntity1.setKeyword("foo");
+		repository.save(sampleEntity1);
+
+		String documentId2 = randomNumeric(32);
+		SampleEntity sampleEntity2 = new SampleEntity();
+		sampleEntity2.setId(documentId2);
+		sampleEntity2.setKeyword("bar");
+		repository.save(sampleEntity2);
+
+		List<String> keywords = new ArrayList<>();
+		keywords.add("foo");
+
+		for (int i = 0; i < 1025; i++) {
+			keywords.add(randomNumeric(32));
+		}
+
+		// when
+		List<SampleEntity> list = repository.findByKeywordNotIn(keywords);
+
+		// then
+		assertThat(list.size()).isEqualTo(1L);
+		assertThat(list.get(0).getId()).isEqualTo(documentId2);
+>>>>>>> 1b222fa1... Use terms-query instead of should for In/NotIn-queries:src/test/java/org/springframework/data/elasticsearch/repositories/custommethod/CustomMethodRepositoryBaseTests.java
 	}
 
 	@Test
@@ -1193,6 +1262,53 @@ public class CustomMethodRepositoryTests {
 
 		// when
 		long count = repository.countByLocationNear(new Point(45.7806d, 3.0875d), new Distance(2, Metrics.KILOMETERS));
+<<<<<<< HEAD:src/test/java/org/springframework/data/elasticsearch/repositories/CustomMethodRepositoryTests.java
+=======
+
+		// then
+		assertThat(count).isEqualTo(1L);
+	}
+
+	@Test // DATAES-605
+	public void streamMethodsShouldWorkWithLargeResultSets() {
+		// given
+		List<SampleEntity> entities = createSampleEntities("abc", 10001);
+		repository.saveAll(entities);
+
+		// when
+		Stream<SampleEntity> stream = streamingRepository.findByType("abc");
+
+		// then
+		assertThat(stream).isNotNull();
+		assertThat(stream.count()).isEqualTo(10001L);
+	}
+
+	@Test // DATAES-605
+	public void streamMethodsCanHandlePageable() {
+		// given
+		List<SampleEntity> entities = createSampleEntities("abc", 10);
+		repository.saveAll(entities);
+
+		// when
+		Stream<SampleEntity> stream = streamingRepository.findByType("abc", PageRequest.of(0, 2));
+
+		// then
+		assertThat(stream).isNotNull();
+		assertThat(stream.count()).isEqualTo(10L);
+	}
+
+	@Test // DATAES-XXX
+	public void streamMethodsCanSort() {
+		// given
+		repository.save(createEntityWithTypeAndRate("abc", 7));
+		repository.save(createEntityWithTypeAndRate("abc", 5));
+		repository.save(createEntityWithTypeAndRate("abc", 12));
+
+		// when
+		Stream<SampleEntity> stream = streamingRepository.findByTypeOrderByRate("abc");
+		List<SampleEntity> list = stream.collect(Collectors.toList());
+
+>>>>>>> 1b222fa1... Use terms-query instead of should for In/NotIn-queries:src/test/java/org/springframework/data/elasticsearch/repositories/custommethod/CustomMethodRepositoryBaseTests.java
 		// then
 		assertThat(count, is(equalTo(1L)));
 	}
@@ -1209,4 +1325,156 @@ public class CustomMethodRepositoryTests {
 		}
 		return entities;
 	}
+<<<<<<< HEAD:src/test/java/org/springframework/data/elasticsearch/repositories/CustomMethodRepositoryTests.java
+=======
+
+	private SampleEntity createEntityWithTypeAndRate(String type, int rate) {
+		SampleEntity entity = new SampleEntity();
+		entity.setId(randomNumeric(32));
+		entity.setAvailable(true);
+		entity.setMessage("Message");
+		entity.setType(type);
+		entity.setRate(rate);
+
+		return entity;
+	}
+
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	@Document(indexName = "test-index-sample-repositories-custo-method", type = "test-type", shards = 1, replicas = 0,
+			refreshInterval = "-1")
+	static class SampleEntity {
+
+		@Id
+		private String id;
+		@Field(type = Text, store = true, fielddata = true)
+		private String type;
+		@Field(type = Text, store = true, fielddata = true)
+		private String message;
+		@Field(type = Keyword)
+		private String keyword;
+		private int rate;
+		private boolean available;
+		private GeoPoint location;
+		@Version
+		private Long version;
+	}
+
+	/**
+	 * @author Rizwan Idrees
+	 * @author Mohsin Husen
+	 * @author Kevin Leturc
+	 */
+	public interface SampleCustomMethodRepository extends ElasticsearchRepository<SampleEntity, String> {
+
+		Page<SampleEntity> findByType(String type, Pageable pageable);
+
+		Page<SampleEntity> findByTypeNot(String type, Pageable pageable);
+
+		@Query("{\"bool\" : {\"must\" : {\"term\" : {\"message\" : \"?0\"}}}}")
+		Page<SampleEntity> findByMessage(String message, Pageable pageable);
+
+		@Query("{\"bool\" : {\"must\" : {\"term\" : {\"message\" : \"?0\"}}}}")
+		List<SampleEntity> findByMessage(String message);
+
+		Page<SampleEntity> findByAvailable(boolean available, Pageable pageable);
+
+		Page<SampleEntity> findByRateLessThan(int rate, Pageable pageable);
+
+		Page<SampleEntity> findByRateBefore(int rate, Pageable pageable);
+
+		Page<SampleEntity> findByRateAfter(int rate, Pageable pageable);
+
+		Page<SampleEntity> findByMessageLike(String message, Pageable pageable);
+
+		Page<SampleEntity> findByMessageStartingWith(String message, Pageable pageable);
+
+		Page<SampleEntity> findByMessageEndingWith(String message, Pageable pageable);
+
+		Page<SampleEntity> findByMessageContaining(String message, Pageable pageable);
+
+		Page<SampleEntity> findByIdIn(List<String> ids, Pageable pageable);
+
+		List<SampleEntity> findByKeywordIn(List<String> keywords);
+
+		List<SampleEntity> findByKeywordNotIn(List<String> keywords);
+
+		Page<SampleEntity> findByIdNotIn(List<String> ids, Pageable pageable);
+
+		Page<SampleEntity> findByAvailableTrue(Pageable pageable);
+
+		Page<SampleEntity> findByAvailableFalse(Pageable pageable);
+
+		Page<SampleEntity> findByMessageOrderByTypeAsc(String message, Pageable pageable);
+
+		Page<SampleEntity> findByLocation(GeoPoint point, Pageable pageable);
+
+		Page<SampleEntity> findByLocationAndMessage(GeoPoint point, String msg, Pageable pageable);
+
+		Page<SampleEntity> findByLocationWithin(GeoPoint point, String distance, Pageable pageable);
+
+		Page<SampleEntity> findByLocationWithin(Point point, Distance distance, Pageable pageable);
+
+		Page<SampleEntity> findByLocationNear(GeoBox box, Pageable pageable);
+
+		Page<SampleEntity> findByLocationNear(Box box, Pageable pageable);
+
+		Page<SampleEntity> findByLocationNear(Point point, Distance distance, Pageable pageable);
+
+		Page<SampleEntity> findByLocationNear(GeoPoint point, String distance, Pageable pageable);
+
+		long countByType(String type);
+
+		long countByTypeNot(String type);
+
+		long countByAvailable(boolean available);
+
+		long countByRateLessThan(int rate);
+
+		long countByRateBefore(int rate);
+
+		long countByRateAfter(int rate);
+
+		long countByMessageLike(String message);
+
+		long countByMessageStartingWith(String message);
+
+		long countByMessageEndingWith(String message);
+
+		long countByMessageContaining(String message);
+
+		long countByIdIn(List<String> ids);
+
+		long countByIdNotIn(List<String> ids);
+
+		long countByAvailableTrue();
+
+		long countByAvailableFalse();
+
+		long countByLocationWithin(GeoPoint point, String distance);
+
+		long countByLocationWithin(Point point, Distance distance);
+
+		long countByLocationNear(GeoBox box);
+
+		long countByLocationNear(Box box);
+
+		long countByLocationNear(Point point, Distance distance);
+
+		long countByLocationNear(GeoPoint point, String distance);
+	}
+
+	/**
+	 * @author Rasmus Faber-Espensen
+	 */
+	public interface SampleStreamingCustomMethodRepository extends ElasticsearchRepository<SampleEntity, String> {
+		Stream<SampleEntity> findByType(String type);
+
+		Stream<SampleEntity> findByType(String type, Pageable pageable);
+
+		Stream<SampleEntity> findByTypeOrderByRate(String type);
+	}
+>>>>>>> 1b222fa1... Use terms-query instead of should for In/NotIn-queries:src/test/java/org/springframework/data/elasticsearch/repositories/custommethod/CustomMethodRepositoryBaseTests.java
 }
