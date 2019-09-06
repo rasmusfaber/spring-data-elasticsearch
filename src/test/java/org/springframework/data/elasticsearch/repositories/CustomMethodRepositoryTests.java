@@ -57,7 +57,6 @@ public class CustomMethodRepositoryTests {
 
 	@Autowired private ElasticsearchTemplate elasticsearchTemplate;
 
-<<<<<<< HEAD:src/test/java/org/springframework/data/elasticsearch/repositories/CustomMethodRepositoryTests.java
 	@Before
 	public void before() {
 		elasticsearchTemplate.deleteIndex(SampleEntity.class);
@@ -66,8 +65,6 @@ public class CustomMethodRepositoryTests {
 		elasticsearchTemplate.refresh(SampleEntity.class);
 	}
 
-=======
->>>>>>> 1b222fa1... Use terms-query instead of should for In/NotIn-queries:src/test/java/org/springframework/data/elasticsearch/repositories/custommethod/CustomMethodRepositoryBaseTests.java
 	@Test
 	public void shouldExecuteCustomMethod() {
 		// given
@@ -301,11 +298,6 @@ public class CustomMethodRepositoryTests {
 		// when
 		Page<SampleEntity> page = repository.findByIdNotIn(ids, new PageRequest(0, 10));
 		// then
-<<<<<<< HEAD:src/test/java/org/springframework/data/elasticsearch/repositories/CustomMethodRepositoryTests.java
-		assertThat(page, is(notNullValue()));
-		assertThat(page.getTotalElements(), is(equalTo(1L)));
-		assertThat(page.getContent().get(0).getId(), is(documentId2));
-=======
 		assertThat(page).isNotNull();
 		assertThat(page.getTotalElements()).isEqualTo(1L);
 		assertThat(page.getContent().get(0).getId()).isEqualTo(documentId2);
@@ -369,7 +361,6 @@ public class CustomMethodRepositoryTests {
 		// then
 		assertThat(list.size()).isEqualTo(1L);
 		assertThat(list.get(0).getId()).isEqualTo(documentId2);
->>>>>>> 1b222fa1... Use terms-query instead of should for In/NotIn-queries:src/test/java/org/springframework/data/elasticsearch/repositories/custommethod/CustomMethodRepositoryBaseTests.java
 	}
 
 	@Test
@@ -1262,53 +1253,6 @@ public class CustomMethodRepositoryTests {
 
 		// when
 		long count = repository.countByLocationNear(new Point(45.7806d, 3.0875d), new Distance(2, Metrics.KILOMETERS));
-<<<<<<< HEAD:src/test/java/org/springframework/data/elasticsearch/repositories/CustomMethodRepositoryTests.java
-=======
-
-		// then
-		assertThat(count).isEqualTo(1L);
-	}
-
-	@Test // DATAES-605
-	public void streamMethodsShouldWorkWithLargeResultSets() {
-		// given
-		List<SampleEntity> entities = createSampleEntities("abc", 10001);
-		repository.saveAll(entities);
-
-		// when
-		Stream<SampleEntity> stream = streamingRepository.findByType("abc");
-
-		// then
-		assertThat(stream).isNotNull();
-		assertThat(stream.count()).isEqualTo(10001L);
-	}
-
-	@Test // DATAES-605
-	public void streamMethodsCanHandlePageable() {
-		// given
-		List<SampleEntity> entities = createSampleEntities("abc", 10);
-		repository.saveAll(entities);
-
-		// when
-		Stream<SampleEntity> stream = streamingRepository.findByType("abc", PageRequest.of(0, 2));
-
-		// then
-		assertThat(stream).isNotNull();
-		assertThat(stream.count()).isEqualTo(10L);
-	}
-
-	@Test // DATAES-XXX
-	public void streamMethodsCanSort() {
-		// given
-		repository.save(createEntityWithTypeAndRate("abc", 7));
-		repository.save(createEntityWithTypeAndRate("abc", 5));
-		repository.save(createEntityWithTypeAndRate("abc", 12));
-
-		// when
-		Stream<SampleEntity> stream = streamingRepository.findByTypeOrderByRate("abc");
-		List<SampleEntity> list = stream.collect(Collectors.toList());
-
->>>>>>> 1b222fa1... Use terms-query instead of should for In/NotIn-queries:src/test/java/org/springframework/data/elasticsearch/repositories/custommethod/CustomMethodRepositoryBaseTests.java
 		// then
 		assertThat(count, is(equalTo(1L)));
 	}
@@ -1325,8 +1269,6 @@ public class CustomMethodRepositoryTests {
 		}
 		return entities;
 	}
-<<<<<<< HEAD:src/test/java/org/springframework/data/elasticsearch/repositories/CustomMethodRepositoryTests.java
-=======
 
 	private SampleEntity createEntityWithTypeAndRate(String type, int rate) {
 		SampleEntity entity = new SampleEntity();
@@ -1476,5 +1418,4 @@ public class CustomMethodRepositoryTests {
 
 		Stream<SampleEntity> findByTypeOrderByRate(String type);
 	}
->>>>>>> 1b222fa1... Use terms-query instead of should for In/NotIn-queries:src/test/java/org/springframework/data/elasticsearch/repositories/custommethod/CustomMethodRepositoryBaseTests.java
 }
