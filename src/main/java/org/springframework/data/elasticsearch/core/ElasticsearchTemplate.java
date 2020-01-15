@@ -339,6 +339,13 @@ public class ElasticsearchTemplate implements ElasticsearchOperations, Applicati
 	@Override
 	public <T> List<String> queryForIds(SearchQuery query) {
 		SearchRequestBuilder request = prepareSearch(query).setQuery(query.getQuery());
+
+		if (query.getElasticsearchSorts() != null) {
+			for (SortBuilder elasticsearchSort : query.getElasticsearchSorts()) {
+				request.addSort(elasticsearchSort);
+			}
+		}
+
 		if (query.getFilter() != null) {
 			request.setPostFilter(query.getFilter());
 		}
